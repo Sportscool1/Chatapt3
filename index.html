@@ -141,7 +141,7 @@
 <script src="assets/js/t.min.js"></script>
 <script>
   // Define the dictionary
-  let dictionary = {
+  let dictionary = JSON.parse(localStorage.getItem("dictionary")) || {
     "hello": "Hi there!",
     "how are you": "I'm doing well, thank you for asking.",
     "goodbye": "Goodbye! Have a great day!",
@@ -229,6 +229,7 @@
       let key = $(this).data("key");
       let response = $("#response-" + key).val();
       dictionary[key] = response;
+      localStorage.setItem("dictionary", JSON.stringify(dictionary));
       $("#chat-" + key).html("<p>" + response + "</p>");
       $("#response-" + key).remove();
       $(this).remove();
