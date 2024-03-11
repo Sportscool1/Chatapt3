@@ -149,7 +149,15 @@
   };
 
   // Define array of swear words
-  const swearWords = ["Fuck", "Shit", "Dick"]; // Add more swear words as needed
+  const swearWords = ["Fuck", "", ""]; // Add more swear words as needed
+
+  // Function to check for swear words
+  function containsSwearWord(input) {
+      // Convert input to lowercase for case-insensitive comparison
+      input = input.toLowerCase();
+      // Check if any of the swear words are present in the input
+      return swearWords.some(word => input.includes(word));
+  }
 
   $(window).on("load", function () {
     $("#loader").fadeOut(100, function () {
@@ -247,11 +255,6 @@
       $("#response-" + key).remove();
       $(this).remove();
     });
-
-    // Function to check for swear words
-    function containsSwearWord(input) {
-        return swearWords.some(word => input.includes(word));
-    }
   });
 </script>
 </body>
