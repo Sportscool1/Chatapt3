@@ -176,14 +176,7 @@
             dictionary[value] +
             "</p></div></div>";
         } else {
-          replay =
-            '<div class="bot-inbox inbox"><div class="wrap"><div class="icon"><img src="../assets/img/logo_100px.png" alt=""></div><div class="msg-header" id="chat-' +
-            value +
-            '"><p>I\'m sorry, I don\'t understand that. Would you like to provide a response?</p><input type="text" id="response-' +
-            value +
-            '" placeholder="Type your response here..." /><button type="button" class="save-response-btn" data-key="' +
-            value +
-            '">Save</button></div></div>';
+          fetchWikipediaData(value);
         }
 
         $(".form").append(replay);
@@ -210,14 +203,7 @@
           dictionary[value] +
           "</p></div></div>";
       } else {
-        replay =
-          '<div class="bot-inbox inbox"><div class="wrap"><div class="icon"><img src="assets/img/x2.png" alt=""></div><div class="msg-header" id="chat-' +
-          value +
-          '"><p>I\'m sorry, I don\'t understand that. Would you like to provide a response?</p><input type="text" id="response-' +
-          value +
-          '" placeholder="Type your response here..." /><button type="button" class="save-response-btn" data-key="' +
-          value +
-          '">Save</button></div></div>';
+        fetchWikipediaData(value);
       }
 
       $(".form").append(replay);
@@ -234,6 +220,40 @@
       $("#response-" + key).remove();
       $(this).remove();
     });
+
+    // Function to fetch Wikipedia data
+    function fetchWikipediaData(query) {
+      $.ajax({
+        url: "https://en.wikipedia.org/w/api.php",
+        data: {
+          action: "query",
+          format: "json",
+          prop: "extracts",
+          exintro: true,
+          explaintext: true,
+          titles: query
+        },
+        dataType: "jsonp",
+        success: function(data) {
+          const pages = data.query.pages;
+          for (let key in pages) {
+            if (pages.hasOwnProperty(key)) {
+              const extract = pages[key].extract;
+              if (extract) {
+                $(".form").append('<div class="bot-inbox inbox"><div class="wrap"><div class="icon"><img src="../assets/img/logo_100px.png" alt=""></div><div class="msg-header" id="chat-' + query + '"><p>' + extract + '</p></div></div>');
+                $(".form").scrollTop($(".form")[0].scrollHeight);
+              } else {
+                $(".form").append('<div class="bot-inbox inbox"><div class="wrap"><div class="icon"><img src="../assets/img/logo_100px.png" alt=""></div><div class="msg-header" id="chat-' + query + '"><p>Sorry, no information found for "' + query + '".</p></div></div>');
+                $(".form").scrollTop($(".form")[0].scrollHeight);
+              }
+            }
+          }
+        },
+        error: function(xhr, status, error) {
+          console.log(error);
+        }
+      });
+    }
   });
 </script>
 </body>
