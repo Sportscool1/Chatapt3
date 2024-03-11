@@ -140,14 +140,6 @@
 <script src="assets/js/bootstrap.bundle.min.js"></script>
 <script src="assets/js/t.min.js"></script>
 <script>
-  // Define the dictionary
-  let dictionary = JSON.parse(localStorage.getItem("dictionary")) || {
-    "hello": "Hi there!",
-    "how are you": "I'm doing well, thank you for asking.",
-    "goodbye": "Goodbye! Have a great day!",
-    // Add more key-value pairs as needed
-  };
-
   $(window).on("load", function () {
     $("#loader").fadeOut(100, function () {
       $("#preloader").fadeOut(200);
@@ -168,19 +160,7 @@
         $("#data").val("");
 
         let replay;
-        if (dictionary[value]) {
-          replay =
-            '<div class="bot-inbox inbox"><div class="wrap"><div class="icon"><img src="../assets/img/logo_100px.png" alt=""></div><div class="msg-header" id="chat-' +
-            value +
-            '"><p>' +
-            dictionary[value] +
-            "</p></div></div>";
-        } else {
-          fetchWikipediaData(value);
-        }
-
-        $(".form").append(replay);
-        $(".form").scrollTop($(".form")[0].scrollHeight);
+        fetchWikipediaData(value);
       }
     });
 
@@ -194,63 +174,42 @@
       $(".form").append(msg);
       $("#data").val("");
 
-      let replay;
-      if (dictionary[value]) {
-        replay =
-          '<div class="bot-inbox inbox"><div class="wrap"><div class="icon"><img src="assets/img/x2.png" alt=""></div><div class="msg-header" id="chat-' +
-          value +
-          '"><p>' +
-          dictionary[value] +
-          "</p></div></div>";
-      } else {
-        fetchWikipediaData(value);
-      }
-
-      $(".form").append(replay);
-      $(".form").scrollTop($(".form")[0].scrollHeight);
-    });
-
-    // Save response event
-    $(document).on("click", ".save-response-btn", function () {
-      let key = $(this).data("key");
-      let response = $("#response-" + key).val();
-      dictionary[key] = response;
-      localStorage.setItem("dictionary", JSON.stringify(dictionary));
-      $("#chat-" + key).html("<p>" + response + "</p>");
-      $("#response-" + key).remove();
-      $(this).remove();
+      fetchWikipediaData(value);
     });
 
     // Function to fetch Wikipedia data
     function fetchWikipediaData(query) {
+      // Construct the URL
+      let apiUrl = `https://api.wikimedia.org/wiki/en.wikipedia.org/v1/page/summary/${query}`;
+
+      // Make the request
       $.ajax({
-        url: "https://en.wikipedia.org/w/api.php",
-        data: {
-          action: "query",
-          format: "json",
-          prop: "extracts",
-          exintro: true,
-          explaintext: true,
-          titles: query
-        },
-        dataType: "jsonp",
+        url: apiUrl,
+        dataType: "json",
         success: function(data) {
-          const pages = data.query.pages;
-          for (let key in pages) {
-            if (pages.hasOwnProperty(key)) {
-              const extract = pages[key].extract;
-              if (extract) {
-                $(".form").append('<div class="bot-inbox inbox"><div class="wrap"><div class="icon"><img src="../assets/img/logo_100px.png" alt=""></div><div class="msg-header" id="chat-' + query + '"><p>' + extract + '</p></div></div>');
-                $(".form").scrollTop($(".form")[0].scrollHeight);
-              } else {
-                $(".form").append('<div class="bot-inbox inbox"><div class="wrap"><div class="icon"><img src="../assets/img/logo_100px.png" alt=""></div><div class="msg-header" id="chat-' + query + '"><p>Sorry, no information found for "' + query + '".</p></div></div>');
-                $(".form").scrollTop($(".form")[0].scrollHeight);
-              }
-            }
+          // Parse and display the response
+          if (data.extract) {
+            replay =
+              '<div class="bot-inbox inbox"><div class="wrap"><div class="icon"><img src="../assets/img/logo_100px.png" alt=""></div><div class="msg-header" id="chat-' +
+              query +
+              '"><p>' +
+              data.extract +
+              "</p></div></div>";
+          } else {
+            replay =
+              '<div class="bot-inbox inbox"><div class="wrap"><div class="icon"><img src="../assets/img/logo_100px.png" alt=""></div><div class="msg-header" id="chat-' +
+              query +
+              '"><p>No information found for "' +
+              query +
+              '".</p></div></div>';
           }
+
+          $(".form").append(replay);
+          $(".form").scrollTop($(".form")[0].scrollHeight);
         },
         error: function(xhr, status, error) {
-          console.log(error);
+          console.error("Error fetching data:", error);
+          // Handle the error
         }
       });
     }
