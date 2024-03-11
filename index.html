@@ -36,7 +36,7 @@
 <!-- Mordernizer -->
 <script src="assets/js/vendor/modernizr-3.11.2.min.js"></script>
 </head>
-<body>
+<body class="loading">
 <div class="wrapper">
   <div class="mobile-header d-lg-none">
     <button
@@ -116,7 +116,7 @@
               placeholder="Type something here.."
               required
             />
-            <button type="button" id="send-btn">
+            <button type="submit" id="send-btn">
               <i class="fa-regular fa-paper-plane"></i>
             </button>
           </div>
@@ -187,17 +187,32 @@ function searchWeb(query) {
 }
 
 $(document).ready(function () {
-    $("#send-btn").click(function() {
+    var i = 0;
+
+    // For Input Enter key
+    $("#data").keyup(function (event) {
+        if (event.keyCode === 13) {
+            sendMessage();
+        }
+    });
+
+    // For Button
+    $("#send-btn").on("click", function () {
+        sendMessage();
+    });
+
+    function sendMessage() {
         var value = $("#data").val();
         var msg = '<div class="user-inbox inbox"><div class="wrap"><div class="icon"><img src="assets/img/x2.png" alt="" /></div><div class="msg-header"><p>' + value + "</p></div></div></div>";
         $(".form").append(msg);
         $("#data").val("");
 
+        var replay;
         if (value.toLowerCase().startsWith("search:")) {
             var query = value.substring(7);
-            var reply = '<div class="bot-inbox inbox"><div class="wrap"><div class="icon"><img src="../assets/img/logo_100px.png" alt=""></div><div class="msg-header" id="chat-' + i + '"><p>Searching the web for: ' + query + '</p><div id="searchResults"></div></div></div>';
+            replay = '<div class="bot-inbox inbox"><div class="wrap"><div class="icon"><img src="../assets/img/logo_100px.png" alt=""></div><div class="msg-header" id="chat-' + i + '"><p>Searching the web for: ' + query + '</p><div id="searchResults"></div></div></div>';
 
-            $(".form").append(reply);
+            $(".form").append(replay);
             $(".form").scrollTop($(".form")[0].scrollHeight);
 
             // Perform web search
@@ -205,8 +220,9 @@ $(document).ready(function () {
         } else {
             // Handle other types of messages here
         }
-    });
+    }
 });
 </script>
+
 </body>
 </html>
