@@ -36,7 +36,7 @@
 <!-- Mordernizer -->
 <script src="assets/js/vendor/modernizr-3.11.2.min.js"></script>
 </head>
-<body>
+<body class="loading">
 <div class="wrapper">
   <div class="mobile-header d-lg-none">
     <button
@@ -147,6 +147,13 @@
     "goodbye": "Goodbye! Have a great day!",
     // Add more key-value pairs as needed
   };
+
+  $(window).on("load", function () {
+    $("#loader").fadeOut(100, function () {
+      $("#preloader").fadeOut(200);
+      $("body").removeClass("loading");
+    });
+  });
 
   $(document).ready(function ($) {
     // For Input Enter key
