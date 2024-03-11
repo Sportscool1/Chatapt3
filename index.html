@@ -138,91 +138,103 @@
 <!-- Scripts -->
 <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
 <script src="assets/js/bootstrap.bundle.min.js"></script>
+<script src="assets/js/t.min.js"></script>
 <script>
-function searchWeb(query) {
-    var searchResultsDiv = document.getElementById("searchResults");
+  // Define the dictionary
+  let dictionary = JSON.parse(localStorage.getItem("dictionary")) || {
+    "hello": "Hi there!",
+    "how are you": "I'm doing well, thank you for asking.",
+    "goodbye": "Goodbye! Have a great day!",
+    // Add more key-value pairs as needed
+  };
 
-    // Clear previous search results
-    searchResultsDiv.innerHTML = "";
-
-    // Construct the Google search URL
-    var googleSearchUrl = "https://www.google.com/search?q=" + encodeURIComponent(query);
-
-    // Fetch the search results page
-    fetch(googleSearchUrl)
-    .then(response => response.text())
-    .then(data => {
-        // Parse the HTML response
-        var parser = new DOMParser();
-        var doc = parser.parseFromString(data, "text/html");
-
-        // Extract search result titles and URLs
-        var searchResultElements = doc.querySelectorAll(".tF2Cxc");
-        searchResultElements.forEach(function(element) {
-            var titleElement = element.querySelector("h3");
-            var urlElement = element.querySelector("a");
-
-            if (titleElement && urlElement) {
-                var title = titleElement.innerText;
-                var url = urlElement.href;
-
-                // Create a link to the search result
-                var link = document.createElement("a");
-                link.href = url;
-                link.textContent = title;
-                link.target = "_blank";
-
-                // Display the search result
-                var searchResult = document.createElement("div");
-                searchResult.appendChild(link);
-                searchResultsDiv.appendChild(searchResult);
-            }
-        });
-    })
-    .catch(error => {
-        console.error("Error fetching search results:", error);
-        // Display an error message
-        searchResultsDiv.textContent = "Error fetching search results. Please try again later.";
+  $(window).on("load", function () {
+    $("#loader").fadeOut(100, function () {
+      $("#preloader").fadeOut(200);
+      $("body").removeClass("loading");
     });
-}
+  });
 
-$(document).ready(function () {
-    var i = 0;
-
+  $(document).ready(function ($) {
     // For Input Enter key
     $("#data").keyup(function (event) {
-        if (event.keyCode === 13) {
-            sendMessage();
+      if (event.keyCode === 13) {
+        let value = $("#data").val().toLowerCase();
+        let msg =
+          '<div class="user-inbox inbox"><div class="wrap"><div class="icon"><img src="assets/img/x2.png" alt="" /></div><div class="msg-header"><p>' +
+          value +
+          "</p></div></div></div>";
+        $(".form").append(msg);
+        $("#data").val("");
+
+        let replay;
+        if (dictionary[value]) {
+          replay =
+            '<div class="bot-inbox inbox"><div class="wrap"><div class="icon"><img src="../assets/img/logo_100px.png" alt=""></div><div class="msg-header" id="chat-' +
+            value +
+            '"><p>' +
+            dictionary[value] +
+            "</p></div></div>";
+        } else {
+          replay =
+            '<div class="bot-inbox inbox"><div class="wrap"><div class="icon"><img src="../assets/img/logo_100px.png" alt=""></div><div class="msg-header" id="chat-' +
+            value +
+            '"><p>I\'m sorry, I don\'t understand that. Would you like to provide a response?</p><input type="text" id="response-' +
+            value +
+            '" placeholder="Type your response here..." /><button type="button" class="save-response-btn" data-key="' +
+            value +
+            '">Save</button></div></div>';
         }
+
+        $(".form").append(replay);
+        $(".form").scrollTop($(".form")[0].scrollHeight);
+      }
     });
 
     // For Button
     $("#send-btn").on("click", function () {
-        sendMessage();
+      let value = $("#data").val().toLowerCase();
+      let msg =
+        '<div class="user-inbox inbox"><div class="wrap"><div class="icon"><img src="assets/img/x2.png" alt="" /></div><div class="msg-header"><p>' +
+        value +
+        "</p></div></div></div>";
+      $(".form").append(msg);
+      $("#data").val("");
+
+      let replay;
+      if (dictionary[value]) {
+        replay =
+          '<div class="bot-inbox inbox"><div class="wrap"><div class="icon"><img src="assets/img/x2.png" alt=""></div><div class="msg-header" id="chat-' +
+          value +
+          '"><p>' +
+          dictionary[value] +
+          "</p></div></div>";
+      } else {
+        replay =
+          '<div class="bot-inbox inbox"><div class="wrap"><div class="icon"><img src="assets/img/x2.png" alt=""></div><div class="msg-header" id="chat-' +
+          value +
+          '"><p>I\'m sorry, I don\'t understand that. Would you like to provide a response?</p><input type="text" id="response-' +
+          value +
+          '" placeholder="Type your response here..." /><button type="button" class="save-response-btn" data-key="' +
+          value +
+          '">Save</button></div></div>';
+      }
+
+      $(".form").append(replay);
+      $(".form").scrollTop($(".form")[0].scrollHeight);
     });
 
-    function sendMessage() {
-        var value = $("#data").val();
-        var msg = '<div class="user-inbox inbox"><div class="wrap"><div class="icon"><img src="assets/img/x2.png" alt="" /></div><div class="msg-header"><p>' + value + "</p></div></div></div>";
-        $(".form").append(msg);
-        $("#data").val("");
-
-        var replay;
-        if (value.toLowerCase().startsWith("search:")) {
-            var query = value.substring(7);
-            replay = '<div class="bot-inbox inbox"><div class="wrap"><div class="icon"><img src="../assets/img/logo_100px.png" alt=""></div><div class="msg-header" id="chat-' + i + '"><p>Searching the web for: ' + query + '</p><div id="searchResults"></div></div></div>';
-
-            $(".form").append(replay);
-            $(".form").scrollTop($(".form")[0].scrollHeight);
-
-            // Perform web search
-            searchWeb(query);
-        } else {
-            // Handle other types of messages here
-        }
-    }
-});
+    // Save response event
+    $(document).on("click", ".save-response-btn", function () {
+      let key = $(this).data("key");
+      let response = $("#response-" + key).val();
+      dictionary[key] = response;
+      localStorage.setItem("dictionary", JSON.stringify(dictionary));
+      $("#chat-" + key).html("<p>" + response + "</p>");
+      $("#response-" + key).remove();
+      $(this).remove();
+    });
+  });
 </script>
-
 </body>
 </html>
