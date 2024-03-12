@@ -35,6 +35,9 @@
 
 <!-- Mordernizer -->
 <script src="assets/js/vendor/modernizr-3.11.2.min.js"></script>
+
+<!-- Math.js -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/9.5.0/math.min.js"></script>
 </head>
 <body class="loading">
 <div class="wrapper">
@@ -71,20 +74,20 @@
             <li>
               <a href="https://docs.xai.cx/"
                 ><span
-                  ><i class="fa-solid fa-up-right-from-square"></i></span
+                  ><i class="fas fa-angle-up"></i></span
                 >Docs</a
               >
             </li>
             <li>
               <a href="https://xai.cx/"
-                ><span><i class="fa-regular fa-user"></i></span>X AI -
+                ><span><i class="far fa-user"></i></span>X AI -
                 Homepage</a
               >
             </li>
             <li>
               <a href="https://xai.cx/draw"
                 ><span
-                  ><i class="fa-solid fa-up-right-from-square"></i></span
+                  ><i class="fas fa-angle-up"></i></span
                 >X Draw</a
               >
             </li>
@@ -117,7 +120,7 @@
               required
             />
             <button type="submit" id="send-btn">
-              <i class="fa-regular fa-paper-plane"></i>
+              <i class="far fa-paper-plane"></i>
             </button>
           </div>
           <p>
@@ -160,6 +163,15 @@
     return false;
   }
 
+  // Function to check if input is a mathematical expression and solve it
+  function solveMath(input) {
+    try {
+      return math.evaluate(input);
+    } catch (error) {
+      return null;
+    }
+  }
+
   $(window).on("load", function () {
     $("#loader").fadeOut(100, function () {
       $("#preloader").fadeOut(200);
@@ -193,14 +205,24 @@
             dictionary[value] +
             "</p></div></div>";
         } else {
-          replay =
-            '<div class="bot-inbox inbox"><div class="wrap"><div class="icon"><img src="../assets/img/logo_100px.png" alt=""></div><div class="msg-header" id="chat-' +
-            value +
-            '"><p>I\'m sorry, I don\'t understand that. Would you like to provide a response?</p><input type="text" id="response-' +
-            value +
-            '" placeholder="Type your response here..." /><button type="button" class="save-response-btn" data-key="' +
-            value +
-            '">Save</button></div></div>';
+          const result = solveMath(value);
+          if (result !== null) {
+            replay =
+              '<div class="bot-inbox inbox"><div class="wrap"><div class="icon"><img src="../assets/img/logo_100px.png" alt=""></div><div class="msg-header" id="chat-' +
+              value +
+              '"><p>' +
+              result +
+              "</p></div></div>";
+          } else {
+            replay =
+              '<div class="bot-inbox inbox"><div class="wrap"><div class="icon"><img src="../assets/img/logo_100px.png" alt=""></div><div class="msg-header" id="chat-' +
+              value +
+              '"><p>I\'m sorry, I don\'t understand that. Would you like to provide a response?</p><input type="text" id="response-' +
+              value +
+              '" placeholder="Type your response here..." /><button type="button" class="save-response-btn" data-key="' +
+              value +
+              '">Save</button></div></div>';
+          }
         }
 
         $(".form").append(replay);
@@ -232,14 +254,24 @@
           dictionary[value] +
           "</p></div></div>";
       } else {
-        replay =
-          '<div class="bot-inbox inbox"><div class="wrap"><div class="icon"><img src="assets/img/x2.png" alt=""></div><div class="msg-header" id="chat-' +
-          value +
-          '"><p>I\'m sorry, I don\'t understand that. Would you like to provide a response?</p><input type="text" id="response-' +
-          value +
-          '" placeholder="Type your response here..." /><button type="button" class="save-response-btn" data-key="' +
-          value +
-          '">Save</button></div></div>';
+        const result = solveMath(value);
+        if (result !== null) {
+          replay =
+            '<div class="bot-inbox inbox"><div class="wrap"><div class="icon"><img src="assets/img/x2.png" alt=""></div><div class="msg-header" id="chat-' +
+            value +
+            '"><p>' +
+            result +
+            "</p></div></div>";
+        } else {
+          replay =
+            '<div class="bot-inbox inbox"><div class="wrap"><div class="icon"><img src="assets/img/x2.png" alt=""></div><div class="msg-header" id="chat-' +
+            value +
+            '"><p>I\'m sorry, I don\'t understand that. Would you like to provide a response?</p><input type="text" id="response-' +
+            value +
+            '" placeholder="Type your response here..." /><button type="button" class="save-response-btn" data-key="' +
+            value +
+            '">Save</button></div></div>';
+        }
       }
 
       $(".form").append(replay);
