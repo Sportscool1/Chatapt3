@@ -148,17 +148,6 @@
     // Add more key-value pairs as needed
   };
 
-  // Define array of swear words
-  const swearWords = ["Fuck", "Ass", "Shit"]; // Add more swear words as needed
-
-  // Function to check for swear words
-  function containsSwearWord(input) {
-      // Convert input to lowercase for case-insensitive comparison
-      input = input.toLowerCase();
-      // Check if any of the swear words are present in the input
-      return swearWords.some(word => input.includes(word));
-  }
-
   $(window).on("load", function () {
     $("#loader").fadeOut(100, function () {
       $("#preloader").fadeOut(200);
@@ -171,11 +160,6 @@
     $("#data").keyup(function (event) {
       if (event.keyCode === 13) {
         let value = $("#data").val().toLowerCase();
-        // Check for swear words
-        if (containsSwearWord(value)) {
-          alert("Please refrain from using inappropriate language.");
-          return;
-        }
         let msg =
           '<div class="user-inbox inbox"><div class="wrap"><div class="icon"><img src="assets/img/x2.png" alt="" /></div><div class="msg-header"><p>' +
           value +
@@ -210,11 +194,6 @@
     // For Button
     $("#send-btn").on("click", function () {
       let value = $("#data").val().toLowerCase();
-      // Check for swear words
-      if (containsSwearWord(value)) {
-        alert("Please refrain from using inappropriate language.");
-        return;
-      }
       let msg =
         '<div class="user-inbox inbox"><div class="wrap"><div class="icon"><img src="assets/img/x2.png" alt="" /></div><div class="msg-header"><p>' +
         value +
